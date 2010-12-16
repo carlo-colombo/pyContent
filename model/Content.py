@@ -1,15 +1,22 @@
 import logging
 import re
 from google.appengine.ext import db
+from Repository import Repository
 
 class Content(db.Expando):
     name__ = db.StringProperty(required=True,name="name")
     creationDate=db.DateTimeProperty(required=True)
 
-    def __init__(self, parent=None, key_name=None, _app=None, **kwds):
+    def __init__(self, parent=None, key_name=None, _app=None, repository=None, **kwds):
+        #rimuovere dipendenza da ContentUtils
         kwds['name']=ContentUtils.sanitize(kwds["name"])
         kwds['creationDate']=db.DateTimeProperty.now()
-        db.Expando.__init__(self,parent=parent, key_name=key_name, _app=None, **kwds)
+        if repository:
+            if isinstance(repository, Repository):
+                parent=repository
+            else:
+                raise NotValidRepositoryException("repository's class is %s, it shoul be %s"%(type(repository),Repository.__class__))
+        db.Expando.__init__(self,parent=parent, key_name=key_name, _app=_app, **kwds)
         
     def setName(self,name):
         self.name__=ContentUtils.sanitize(name)
@@ -81,3 +88,6 @@ class MethodNotYetImplementedException(Exception):
     
 class PathNotFoundException(Exception):
     """Path not found"""
+    
+class NotValidRepositoryException(Exception):
+    """Not valid istance of Repository (or subclass)"""

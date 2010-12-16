@@ -3,11 +3,16 @@ import logging
 
 import pdb
 
-from model.Content import Content,PathNotFoundException
+from model.Content import Content,PathNotFoundException, NotValidRepositoryException
+from model.Repository import Repository
 
 #import unittest.TestCase as t
 
 class ContentModelTest(unittest.TestCase):
+    
+    mockRepo=Repository(name="mock")
+    mockRepo.put()
+    
     def content_creation_test(self):
         c=Content(name="dsas")
         c.put()
@@ -113,3 +118,15 @@ class ContentModelTest(unittest.TestCase):
         oc.name="content"
         oc.put
         self.assertEquals(oc.name,"content0")
+        
+    def wrong_repo_test(self):
+        fakerepo=Content(name="i-m-a-repo")
+        fakerepo.put()
+        try:
+            c=Content(name="content",repository=fakerepo)
+        except NotValidRepositoryException:
+            self.assertTrue(True)
+        except:
+            self.assertTrue(False)
+        else:
+            self.assertTrue(False)
