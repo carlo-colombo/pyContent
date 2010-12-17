@@ -52,10 +52,10 @@ class Content(db.Expando):
         #raise MethodNotYetImplemented()
 
     def getLevel(self):
-        if self.parent():
-            return self.parent().getLevel() + 1
-        else:
+        if not self.parent() or isinstance(self.parent(),Repository):
             return 1
+        else:
+            return self.parent().getLevel() + 1
         
     name=property(fget=getName,fset=setName)
     handle=property(fget=getHandle)

@@ -130,3 +130,16 @@ class ContentModelTest(unittest.TestCase):
             self.assertTrue(False)
         else:
             self.assertTrue(False)
+            
+    def repo_test(self):
+        c=Content(name="content",repository=self.mockRepo)
+        c.put()
+        self.assertEquals(c.parent().name,self.mockRepo.name)
+        
+    def level_with_repo_test(self):
+        c=Content(name="content",repository=self.mockRepo)
+        c.put()
+        self.assertEquals(c.level,1)
+        c1=Content(name="content1",parent=c)
+        c1.put()
+        self.assertEquals(c1.level,2)
