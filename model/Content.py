@@ -15,8 +15,15 @@ class Content(db.Expando):
             if isinstance(repository, Repository):
                 parent=repository
             else:
-                raise NotValidRepositoryException("repository's class is %s, it shoul be %s"%(type(repository),Repository.__class__))
+                raise NotValidRepositoryException("repository class is %s, it should be %s"%(type(repository),Repository.__class__))
         db.Expando.__init__(self,parent=parent, key_name=key_name, _app=_app, **kwds)
+        
+    def __getitem__(self,key):
+        #q=Content.Query()
+        r=Content.all().ancestor(self.key()).filter('__key__ !=',self.key()).filter('name = ',key).fetch(1)
+        if not r:
+            raise KeyError
+        return r[0]
         
     def setName(self,name):
         self.name__=ContentUtils.sanitize(name)
