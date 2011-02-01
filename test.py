@@ -7,6 +7,29 @@ from model.Content import Content,PathNotFoundException, NotValidRepositoryExcep
 from model.Repository import Repository
 
 #import unittest.TestCase as t
+class ContentModelDictTest(unittest.TestCase):     
+    def check_raise_key_error_no_children_test(self):
+        c=Content(name="no_children")
+        c.put()
+        self.assertRaises(KeyError,c.__getitem__,"child_key")
+        
+    def check_raise_key_error_no_key_test(self):
+        p=Content(name="parent_with_children")
+        p.put()
+        c=Content(name="right_children",parent=p)
+        c.put()
+        self.assertRaises(KeyError,p.__getitem__,"wrong_children")
+        
+    def working_get_item_test(self):
+        p=Content(name="parent_with_children")
+        p.put()
+        c=Content(name="right_children",parent=p, some_property="a property")
+        c.put()
+        try:
+            p.__getitem__("right_children")
+        except KeyError:
+            self.fail()
+        self.assertEquals(p.__getitem__("right_children").some_property,"a property")
 
 class ContentModelTest(unittest.TestCase):
     
@@ -116,7 +139,7 @@ class ContentModelTest(unittest.TestCase):
         oc.put()
         self.assertEquals(oc.name,"other-content")
         oc.name="content"
-        oc.put
+        oc.put()
         self.assertEquals(oc.name,"content0")
         
     def wrong_repo_test(self):
